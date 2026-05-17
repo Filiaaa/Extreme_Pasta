@@ -1,11 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class StartLevelScript : MonoBehaviour
 {
-
     public GameObject[] connections;
     public AudioSource acceptSound;
     public GameObject[] mainLight;
@@ -19,31 +16,93 @@ public class StartLevelScript : MonoBehaviour
     public int secondWindowNumb = 0;
     public int[] mainObjectsUsed;
     public int[] secondObjectsUsed;
-   
+
     public List<int> lastMainObject = new List<int>();
     public List<int> lastSecondObject = new List<int>();
 
     public List<KeyValuePair_<int, int>> settedObjescts = new List<KeyValuePair_<int, int>>();
     public GameObject[] scriptsInScene;
 
-    private void Update()
+    void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (!Input.GetKeyDown(KeyCode.Return) && !Input.GetKeyDown(KeyCode.KeypadEnter))
+            return;
+
+        if (!IsPuzzleComplete())
+            return;
+
+        int resultIndex = lastMainObject[lastMainObject.Count - 1];
+        if (resultIndex < 0 || resultIndex >= settedObjescts.Count)
+            resultIndex = 0;
+
+        int caseNum = settedObjescts[resultIndex].Key;
+        int wait = settedObjescts[resultIndex].Value;
+
+        if (acceptSound != null)
+            acceptSound.Play();
+
+        ActivateSceneScripts(caseNum, wait);
+
+        if (player != null)
+            player.enabled = true;
+
+        gameObject.SetActive(false);
+    }
+
+    bool IsPuzzleComplete()
+    {
+        if (mainObjects == null || mainObjects.Length == 0)
+            return false;
+
+        if (lastMainObject.Count != mainObjects.Length)
+            return false;
+
+        if (lastSecondObject.Count != lastMainObject.Count)
+            return false;
+
+        if (settedObjescts == null || settedObjescts.Count == 0)
+            return false;
+
+        int secondIndex = lastSecondObject[lastSecondObject.Count - 1];
+        if (secondIndex < 0 || secondIndex >= secondObjects.Length)
+            return false;
+
+        SecondIteractiveClass second = secondObjects[secondIndex].GetComponent<SecondIteractiveClass>();
+        if (second == null)
+            return false;
+
+        if (!second.haveTimer)
+            return true;
+
+        if (second.timerSet)
+            return true;
+
+        return second.TryConfirmTimerFromSliders();
+    }
+
+    void ActivateSceneScripts(int caseNum, int wait)
+    {
+        if (scriptsInScene == null)
+            return;
+
+        for (int i = 0; i < scriptsInScene.Length; i++)
         {
-            if (lastSecondObject.Count == lastMainObject.Count && lastMainObject.Count == mainObjects.Length &&
-            ((secondObjects[lastSecondObject[lastSecondObject.Count - 1]].GetComponent<SecondIteractiveClass>().haveTimer &&
-            secondObjects[lastSecondObject[lastSecondObject.Count - 1]].GetComponent<SecondIteractiveClass>().timerSet) ||
-            !secondObjects[lastSecondObject[lastSecondObject.Count - 1]].GetComponent<SecondIteractiveClass>().haveTimer))
+            if (scriptsInScene[i] == null)
+                continue;
+
+            ItemInScene[] items = scriptsInScene[i].GetComponentsInChildren<ItemInScene>(true);
+            if (items.Length == 0)
             {
-                acceptSound.Play();
-                for (int i = 0; i < scriptsInScene.Length; i++)
-                {
-                    scriptsInScene[i].GetComponent<ItemInScene>().caseNumb = settedObjescts[i].Key;
-                    scriptsInScene[i].GetComponent<ItemInScene>().waitTime = settedObjescts[i].Value;
-                    scriptsInScene[i].GetComponent<ItemInScene>().enabled = true;
-                }
-                player.enabled = true;
-                gameObject.SetActive(false);
+                ItemInScene item = scriptsInScene[i].GetComponent<ItemInScene>();
+                if (item != null)
+                    items = new[] { item };
+            }
+
+            foreach (ItemInScene item in items)
+            {
+                item.caseNumb = caseNum;
+                item.waitTime = wait;
+                item.enabled = true;
             }
         }
     }
@@ -53,46 +112,38 @@ public class StartLevelScript : MonoBehaviour
         int mainCount = lastMainObject.Count;
         bool flag = false;
 
-        if (lastSecondObject.Count != mainCount 
-            || (lastSecondObject.Count == mainCount && 
-            (  (secondObjects[lastSecondObject[lastSecondObject.Count - 1]].GetComponent<SecondIteractiveClass>().haveTimer &&
-            secondObjects[lastSecondObject[lastSecondObject.Count - 1]].GetComponent<SecondIteractiveClass>().timerSet) || 
-            !secondObjects[lastSecondObject[lastSecondObject.Count - 1]].GetComponent<SecondIteractiveClass>().haveTimer)))
+        if (lastSecondObject.Count != mainCount
+            || (lastSecondObject.Count == mainCount
+                && ((secondObjects[lastSecondObject[lastSecondObject.Count - 1]].GetComponent<SecondIteractiveClass>().haveTimer
+                     && secondObjects[lastSecondObject[lastSecondObject.Count - 1]].GetComponent<SecondIteractiveClass>().timerSet)
+                    || !secondObjects[lastSecondObject[lastSecondObject.Count - 1]].GetComponent<SecondIteractiveClass>().haveTimer)))
         {
             if (lastMainObject.Count != 0)
             {
                 mainObjects[lastMainObject[lastMainObject.Count - 1]].GetComponent<DragFirstObject>().SetStartPos();
-                lastMainObject.Remove(lastMainObject[lastMainObject.Count - 1]);
+                lastMainObject.RemoveAt(lastMainObject.Count - 1);
                 flag = true;
             }
 
             if (lastSecondObject.Count != 0 && lastSecondObject.Count == mainCount)
             {
                 secondObjects[lastSecondObject[lastSecondObject.Count - 1]].GetComponent<SecondIteractiveClass>().SetStartPos();
-                lastSecondObject.Remove(lastSecondObject[lastSecondObject.Count - 1]);
-
+                lastSecondObject.RemoveAt(lastSecondObject.Count - 1);
             }
+
             if (flag)
             {
                 SetMain();
                 SetOffSecondObjects();
                 mainWindows[mainWindowNumb].enabled = true;
                 if (mainWindowNumb != mainWindows.Length - 1)
-                {
                     mainWindows[mainWindowNumb + 1].enabled = false;
-                }
                 if (secondWindowNumb != secondWindows.Length - 1)
-                {
                     secondWindows[secondWindowNumb + 1].enabled = false;
-                }
 
                 secondWindows[secondWindowNumb].enabled = true;
-
             }
         }
-
-
-
     }
 
     public void UpdateMainWindows()
@@ -101,40 +152,32 @@ public class StartLevelScript : MonoBehaviour
         {
             mainWindows[mainWindowNumb - 1].enabled = false;
             mainWindows[mainWindowNumb].enabled = true;
-
         }
-
     }
-    public void SetSecondObjects(GameObject[] secondObjects)
+
+    public void SetSecondObjects(GameObject[] secondObjectsToShow)
     {
         for (int i = 0; i < secondLight.Length; i++)
         {
             if (secondObjectsUsed[i] == 0)
-            {
                 secondLight[i].SetActive(true);
-            }
             else
-            {
                 secondLight[i].SetActive(false);
-            }
         }
-        foreach (var obj in secondObjects)
-        {
+
+        foreach (GameObject obj in secondObjectsToShow)
             obj.SetActive(true);
-        }
     }
+
     public void SetOffMainObjects()
     {
         for (int i = 0; i < mainLight.Length; i++)
-        {
             mainLight[i].SetActive(false);
-        }
+
         for (int i = 0; i < mainObjects.Length; i++)
         {
             if (mainObjectsUsed[i] != 1)
-            {
                 mainObjects[i].SetActive(false);
-            }
         }
     }
 
@@ -143,32 +186,24 @@ public class StartLevelScript : MonoBehaviour
         for (int i = 0; i < mainLight.Length; i++)
         {
             if (mainObjectsUsed[i] == 0)
-            {
                 mainLight[i].SetActive(true);
-            }
             else
-            {
                 mainLight[i].SetActive(false);
-            }
         }
-        foreach (var obj in mainObjects)
-        {
+
+        foreach (GameObject obj in mainObjects)
             obj.SetActive(true);
-        }
     }
 
     public void SetOffSecondObjects()
     {
         for (int i = 0; i < secondLight.Length; i++)
-        {
             secondLight[i].SetActive(false);
-        }
+
         for (int i = 0; i < secondObjects.Length; i++)
         {
             if (secondObjectsUsed[i] != 1)
-            {
                 secondObjects[i].SetActive(false);
-            }
         }
     }
 
@@ -178,10 +213,9 @@ public class StartLevelScript : MonoBehaviour
         {
             secondWindows[secondWindowNumb - 1].enabled = false;
             secondWindows[secondWindowNumb].enabled = true;
-
         }
-
     }
+
     [System.Serializable]
     public class KeyValuePair_<TKey, TValue>
     {

@@ -131,7 +131,10 @@ public class CheckpointSystem : MonoBehaviour
     {
         if (col == null) return;
 
-        learningObject.SetActive(false);
+        if (learningObject != null)
+        {
+            learningObject.SetActive(false);
+        }
 
         currentCheckpointIndex++;
         currentCheckpointIndex = Mathf.Clamp(currentCheckpointIndex, 0, checkpointPathChoices.Length - 1);

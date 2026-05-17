@@ -15,6 +15,8 @@ public class btn2ndStage : ItemInScene
     float time;
     public bool firstTime = false;
 
+    [SerializeField] private StartLevelScript startLevelScript;
+
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -24,6 +26,7 @@ public class btn2ndStage : ItemInScene
             oldCol.enabled = false;
             newCol.enabled = true;
             GetComponent<SpriteRenderer>().sprite = usedButton;
+            caseNumb = startLevelScript.settedObjescts[0].Key;
             switch (caseNumb)
             {
                 case 0:

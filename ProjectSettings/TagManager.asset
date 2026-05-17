@@ -15,6 +15,7 @@ TagManager:
   - deathCheeseGrater
   - secondCheckPoint
   - end
+  - toasterHandle
   layers:
   - Default
   - TransparentFX

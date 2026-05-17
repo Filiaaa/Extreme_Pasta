@@ -21,6 +21,8 @@ public class CameraMovement : MonoBehaviour
     public Transform downEndPoint;
     public GameObject closingTransition;
 
+    [SerializeField] private int nextSceneIndex;
+
     private Tween currentCameraTween;
 
     private void OnDestroy()
@@ -79,7 +81,7 @@ public class CameraMovement : MonoBehaviour
                 closingTransition.SetActive(true);
 
             DOVirtual.DelayedCall(timeBeforeEnd, () => {
-                SceneManager.LoadScene(0);
+                SceneManager.LoadScene(nextSceneIndex);
             }, false);
         }, false);
     }

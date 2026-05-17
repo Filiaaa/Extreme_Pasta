@@ -82,12 +82,38 @@ public class SecondIteractiveClass : MonoBehaviour, IBeginDragHandler, IDragHand
         foreach (var timer in timers)
         {
             if (timer != timerGo)
-            {
                 timer.SetActive(false);
-            }
         }
-        startLevelScript.settedObjescts[startLevelScript.lastMainObject[startLevelScript.lastMainObject.Count - 1]].Key = number;
-        startLevelScript.settedObjescts[startLevelScript.lastMainObject[startLevelScript.lastMainObject.Count - 1]].Value = timerGo.GetComponent<SetTimer>().time;
+
+        int resultIndex = startLevelScript.lastMainObject[startLevelScript.lastMainObject.Count - 1];
+        if (resultIndex >= 0 && resultIndex < startLevelScript.settedObjescts.Count)
+        {
+            startLevelScript.settedObjescts[resultIndex].Key = number;
+            SetTimer timerComponent = timerGo.GetComponent<SetTimer>();
+            startLevelScript.settedObjescts[resultIndex].Value =
+                timerComponent != null ? timerComponent.time : time;
+        }
+    }
+
+    public bool TryConfirmTimerFromSliders()
+    {
+        if (!haveTimer || timerSet || timers == null || timers.Length == 0)
+            return timerSet;
+
+        foreach (GameObject timer in timers)
+        {
+            if (timer == null || !timer.activeInHierarchy)
+                continue;
+
+            Slider slider = timer.GetComponentInChildren<Slider>(true);
+            if (slider == null)
+                continue;
+
+            SetTimer((int)slider.value, timer);
+            return true;
+        }
+
+        return false;
     }
 
     void IEndDragHandler.OnEndDrag(PointerEventData eventData)

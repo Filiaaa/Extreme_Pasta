@@ -73,6 +73,41 @@ public class InventorySys : MonoBehaviour
         return false; 
     }
 
+    public bool HasItem(int itemId)
+    {
+        foreach (var slot in slots)
+        {
+            if (!slot.IsEmpty && slot.item.id == itemId)
+                return true;
+        }
+        return false;
+    }
+
+    public bool PickupWorldItem(ItemData itemData, Vector3 worldPosition)
+    {
+        if (HasItem(itemData.id) || !AddItem(itemData, 1))
+            return false;
+
+        int slotIndex = -1;
+        for (int i = 0; i < slots.Length; i++)
+        {
+            if (!slots[i].IsEmpty && slots[i].item.id == itemData.id)
+            {
+                slotIndex = i;
+                break;
+            }
+        }
+
+        if (slotIndex != -1)
+        {
+            AnimatePickupToWorldSlot(itemData, worldPosition, slotIndex, UpdateUI);
+            return true;
+        }
+
+        UpdateUI();
+        return true;
+    }
+
     public void UseItemFromSlot(int slotIndex)
     {
         if (slotIndex < 0 || slotIndex >= slots.Length) return;
@@ -234,14 +269,5 @@ public class InventorySys : MonoBehaviour
             if (slots[i].IsEmpty) return i;
         }
         return -1;
-    }
-
-    public bool HasItem(int itemID)
-    {
-        foreach (var slot in slots)
-        {
-            if (!slot.IsEmpty && slot.item.id == itemID) return true;
-        }
-        return false;
     }
 }

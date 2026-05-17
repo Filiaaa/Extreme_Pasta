@@ -70,6 +70,8 @@ public class DragFirstObject : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             startLevelScript.UpdateMainWindows();
             startLevelScript.lastMainObject.Add(number);
 
+            if (number >= 0 && number < startLevelScript.settedObjescts.Count)
+                startLevelScript.settedObjescts[number].Key = number;
         }
         else
         {
