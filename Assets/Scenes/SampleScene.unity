@@ -8681,6 +8681,7 @@ MonoBehaviour:
   downEndPoint: {fileID: 1556494628}
   closingTransition: {fileID: 427205911}
   nextSceneIndex: 2
+  checkpointSystem: {fileID: 1698388354}
 --- !u!114 &519420034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10136,7 +10137,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 595806006}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1e96db6bbd0ca0c4daedc92fc9549d3b, type: 3}
   m_Name: 
@@ -50173,8 +50174,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1632988478}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 33.48, y: 1.3567, z: 0}
-  m_LocalScale: {x: 1, y: 8.234774, z: 1}
+  m_LocalPosition: {x: 33.48, y: 0.562, z: 0}
+  m_LocalScale: {x: 1, y: 11.867841, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1071179270}

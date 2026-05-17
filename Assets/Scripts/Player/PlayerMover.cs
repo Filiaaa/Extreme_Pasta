@@ -287,11 +287,15 @@ public class PlayerMover : MonoBehaviour
 
     private void HandleCheckpoint(Collider2D collision, bool isSecondWay)
     {
+        var collider2D = collision.GetComponent<BoxCollider2D>();
+        if (collider2D == null)
+            return;
+
+        if (checkpointSystem != null && !checkpointSystem.TryAdvanceCheckpoint(collider2D, isSecondWay))
+            return;
+
         if (cameraMovement != null && cameraMovement.pointNumb == -1)
             learning.SetActive(false);
-
-        var collider2D = collision.GetComponent<BoxCollider2D>();
-        checkpointSystem?.SetCheckpoint(collider2D, isSecondWay);
 
         if (cameraMovement != null)
         {

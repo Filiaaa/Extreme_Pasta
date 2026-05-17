@@ -20,7 +20,7 @@ public class MainMenu : MonoBehaviour
 /*        PlayerPrefs.DeleteKey("end");
         PlayerPrefs.DeleteKey("checkPoint");
         PlayerPrefs.DeleteKey("secondWay");*/
-        if (PlayerPrefs.HasKey("end") || !PlayerPrefs.HasKey("checkPoint"))
+        if (PlayerPrefs.HasKey("end") || !PlayerPrefs.HasKey(CheckpointSystem.KeyCheckpoint))
         {
             continueBtn.GetComponent<Image>().raycastTarget = false;
             continueBtn.GetComponent<Image>().color = Color.gray;
@@ -39,9 +39,10 @@ public class MainMenu : MonoBehaviour
         btnImages[0].sprite = usedBtns[0];
         tomato.GetComponent<Image>().sprite = usedTomato;
         transitions.SetActive(true);
-        PlayerPrefs.DeleteKey("secondWay");
-        PlayerPrefs.SetInt("checkPoint", 0);
+        PlayerPrefs.DeleteKey(CheckpointSystem.KeySecondWay);
+        PlayerPrefs.SetInt(CheckpointSystem.KeyCheckpoint, 0);
         PlayerPrefs.DeleteKey("end");
+        PlayerPrefs.Save();
         StartCoroutine(TransitionWaiting());
     }
     IEnumerator TransitionWaiting()
@@ -54,9 +55,10 @@ public class MainMenu : MonoBehaviour
     {
         if (PlayerPrefs.HasKey("end"))
         {
-            PlayerPrefs.DeleteKey("secondWay");
-            PlayerPrefs.SetInt("checkPoint", 0);
+            PlayerPrefs.DeleteKey(CheckpointSystem.KeySecondWay);
+            PlayerPrefs.SetInt(CheckpointSystem.KeyCheckpoint, 0);
             PlayerPrefs.DeleteKey("end");
+            PlayerPrefs.Save();
         }
         btnImages[1].sprite = usedBtns[1];
         tomato.GetComponent<Image>().sprite = usedTomato;

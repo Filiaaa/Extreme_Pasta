@@ -22,6 +22,7 @@ public class CameraMovement : MonoBehaviour
     public GameObject closingTransition;
 
     [SerializeField] private int nextSceneIndex;
+    [SerializeField] private CheckpointSystem checkpointSystem;
 
     private Tween currentCameraTween;
 
@@ -76,6 +77,7 @@ public class CameraMovement : MonoBehaviour
 
     private void OnEndMoveComplete()
     {
+        checkpointSystem.ResetPlayerPrefs();
         DOVirtual.DelayedCall(timeBeforeTransition, () => {
             if (closingTransition != null)
                 closingTransition.SetActive(true);
